@@ -4,9 +4,9 @@ PID or proportional–integral–derivative controller is widely used in industr
 
 In this project pid control is used to control steering angle & throttle of the vehicle by continuously calculating pid errors, given the distance between the actual car position on the road and a reference trajectory, known as cross-track error (cte) to minimize errors:
 
-* p_error: cross track error
-* d_error: as the difference between a desired setpoint and a measured process variable
-* i_error: 
+* p_error: cte as the difference between a desired setpoint and a measured process variable
+* d_error: (cte - cte_previoues) as the change of the cte, Kd parameter is provided to fix unstable behavior of the d_error
+* i_error: total_cte, external forces can cause error in the controller predictions and take vehicle off the road. Minimizing the total error helps pushing the car back to the intended path.
 
 I did manual tuning using [wikipedia](https://en.wikipedia.org/wiki/PID_controller), by first setting Kp, Kd & Ki values to zero. I increased Kp until the output of the loop oscillates, then started tweaking Ki to correct offset considering that high Ki would cause instability. Finally, I increase Kd until the loop is acceptably quick to reach its reference after a load disturbance considering that too much Kd will cause excessive response and overshoot. 
 However fast tuning usually overshoots slightly to reach the setpoint more quickly which is very noticable when car is adjusting its steering-angle on entering or exiting turns; and I believe combining the results with machine learning tehcniques used in behaviroal cloning project would achive optimum result and correct flaws in both approaches.
