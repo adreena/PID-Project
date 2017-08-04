@@ -8,7 +8,7 @@ In this project pid control is used to control steering angle & throttle of the 
 * d_error: as the difference between a desired setpoint and a measured process variable
 * i_error: 
 
-I did manual tuning using [wikipedia](https://en.wikipedia.org/wiki/PID_controller), by first setting Kp, Kd & Ki values to zero. I increased Kp until the output of the loop oscillates, then started tweaking Ki to correct offset considering that high Ki would cause instability. Finally, I increase Kd, if required, until the loop is acceptably quick to reach its reference after a load disturbance considering that too much Kd will cause excessive response and overshoot. 
+I did manual tuning using [wikipedia](https://en.wikipedia.org/wiki/PID_controller), by first setting Kp, Kd & Ki values to zero. I increased Kp until the output of the loop oscillates, then started tweaking Ki to correct offset considering that high Ki would cause instability. Finally, I increase Kd until the loop is acceptably quick to reach its reference after a load disturbance considering that too much Kd will cause excessive response and overshoot. 
 However fast tuning usually overshoots slightly to reach the setpoint more quickly which is very noticable when car is adjusting its steering-angle on entering or exiting turns; and I believe combining the results with machine learning tehcniques used in behaviroal cloning project would achive optimum result and correct flaws in both approaches.
 
 I also used pid for adjusting throttle to speed up or brake, however I had to set conditions for checking cte values and sharp steering-angles to lower the throttle when error/curve is increasing for a smoother driving.
