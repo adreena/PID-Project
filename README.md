@@ -1,6 +1,24 @@
 # CarND-Controls-PID
 
-In this project pid control is used to control steering angle & throttle of the vehicle, 
+PID or proportional–integral–derivative controller is widely used in industrial control systems and a variety of other applications requiring continuously modulated control. 
+
+In this project pid control is used to control steering angle & throttle of the vehicle by continuously calculating pid errors, given the distance between the actual car position on the road and a reference trajectory, known as cross-track error (cte) to minimize errors:
+
+* p_error: cross track error
+* d_error: as the difference between a desired setpoint and a measured process variable
+* i_error: 
+
+I did manual tuning using [wikipedia](https://en.wikipedia.org/wiki/PID_controller), by first setting Kp, Kd & Ki values to zero. I increased Kp until the output of the loop oscillates, then started tweaking Ki to correct offset considering that high Ki would cause instability. Finally, I increase Kd, if required, until the loop is acceptably quick to reach its reference after a load disturbance considering that too much Kd will cause excessive response and overshoot. 
+However fast tuning usually overshoots slightly to reach the setpoint more quickly which is very noticable when car is adjusting its steering-angle on entering or exiting turns; and I believe combining the results with machine learning tehcniques used in behaviroal cloning project would achive optimum result and correct flaws in both approaches.
+
+I also used pid for adjusting throttle to speed up or brake, however I had to set conditions for checking cte values and sharp steering-angles to lower the throttle when error/curve is increasing for a smoother driving.
+
+## My twiddle expermient and why it failed
+
+I tried using the twiddle code (taught in the course) and there were a couple of obstacles using it in a realtime scenario.
+For the very first error-avg (as best average error) robot is moved for 100 iterations and error is averaged, then one of the Kp/Kd/Ki is modified to run the 100-iteration experiment on the robot again and reseting total_error, the same process is repeated for the next 100 iterations over and over again. Applying it to simulated car, 100 iteration is enough to increase cte and go off the road (fewer iterations didn't resolve the issue either and I wasn't able to tune dp values, code is commented out in pid.cpp).
+I think twiddle is good for an offline experiment to adjust K values and re-run the car on same path multiple times rather than running it on a road wihtout similar starting points and curves, then running it in realtime. 
+
 
 ## Dependencies
 
