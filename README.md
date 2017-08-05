@@ -1,7 +1,24 @@
 # CarND-Controls-PID
-Self-Driving Car Engineer Nanodegree Program
 
----
+PID or proportional–integral–derivative controller is widely used in industrial control systems and a variety of other applications requiring continuously modulated control. 
+
+In this project pid control is used to control steering angle & throttle of the vehicle by continuously calculating pid errors, given the distance between the actual car position on the road and a reference trajectory, known as cross-track error (cte) to minimize errors:
+
+* p_error: cte as the difference between a desired setpoint and a measured process variable
+* d_error: (cte - cte_previoues) as the change of the cte, Kd parameter is provided to fix unstable behavior of the d_error
+* i_error: total_cte, external forces can cause error in the controller predictions and take vehicle off the road. Minimizing the total error helps pushing the car back to the intended path.
+
+I did manual tuning using [wikipedia](https://en.wikipedia.org/wiki/PID_controller), by first setting Kp, Kd & Ki values to zero. I increased Kp until the output of the loop oscillates, then started tweaking Ki to correct offset considering that high Ki would cause instability. Finally, I increase Kd until the loop is acceptably quick to reach its reference after a load disturbance considering that too much Kd will cause excessive response and overshoot. 
+However fast tuning usually overshoots slightly to reach the setpoint more quickly which is very noticable when car is adjusting its steering-angle on entering or exiting turns; and I believe combining the results with machine learning tehcniques used in behaviroal cloning project would achive optimum result and correct flaws in both approaches.
+
+I also used pid for adjusting throttle to speed up or brake, however I had to set conditions for checking cte values and sharp steering-angles to lower the throttle when error/curve is increasing for a smoother driving.
+
+## My twiddle expermient and why it failed
+
+I tried using the twiddle code (taught in the course) and there were a couple of obstacles using it in a realtime scenario.
+For the very first error-avg (as best average error) robot is moved for 100 iterations and error is averaged, then one of the Kp/Kd/Ki is modified to run the 100-iteration experiment on the robot again and reseting total_error, the same process is repeated for the next 100 iterations over and over again. Applying it to simulated car, 100 iteration is enough to increase cte and go off the road (fewer iterations didn't resolve the issue either and I wasn't able to tune dp values, code is commented out in pid.cpp).
+I think twiddle is good for an offline experiment to adjust K values and re-run the car on same path multiple times rather than running it on a road wihtout similar starting points and curves, then running it in realtime. 
+
 
 ## Dependencies
 
@@ -34,59 +51,3 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 2. Make a build directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./pid`. 
-
-## Editor Settings
-
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
-
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
-
-## Code Style
-
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
-
-## Project Instructions and Rubric
-
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
-
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
-
-## Hints!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
