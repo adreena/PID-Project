@@ -37,8 +37,8 @@ int main()
   PID throttle_pid;
   // TODO: Initialize the pid variable.
   //Kp, Ki, Kd
-  steer_pid.Init(.15, 0.0001, 2.7);
-  throttle_pid.Init(.2, 0.0, .2);
+  steer_pid.Init(.25, 0.0001, 2.7);
+  throttle_pid.Init(.2, 0.0, .1);
 
   h.onMessage([&steer_pid, &throttle_pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
@@ -64,13 +64,13 @@ int main()
           */
           steer_pid.UpdateError(cte);
           steer_value = -steer_pid.Kp * steer_pid.p_error - steer_pid.Kd * steer_pid.d_error - steer_pid.Ki * steer_pid.i_error;
-         
+
           throttle_pid.UpdateError(cte);
           double throttle =  0.6 -throttle_pid.Kp * throttle_pid.p_error - throttle_pid.Kd * throttle_pid.d_error - throttle_pid.Ki * throttle_pid.i_error;
-          
+
           //minor fix on throttle if cte is over 0.2 and throttle is higher than 0.7
-          if( ((fabs(steer_value) > 0.2 || fabs(cte)> 0.2) && throttle> 0.7)){
-             throttle -= 0.5 ;
+          if( ((fabs(steer_value) > 0.2 || fabs(cte)> 0.2) && throttle> 0.5)){
+             throttle -= 0.4 ;
            }
 
 
