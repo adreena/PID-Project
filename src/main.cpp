@@ -37,9 +37,9 @@ int main()
   PID throttle_pid;
   // TODO: Initialize the pid variable.
   //Kp, Ki, Kd
-  // pid.Init(.4,0.0,1.5);
-  steer_pid.Init(.2, 0.0001, 3.0);
-  throttle_pid.Init(.5, 0.0, .01);
+  steer_pid.Init(.15, 0.0001, 2.7);
+  throttle_pid.Init(.2, 0.0, .2);
+
   h.onMessage([&steer_pid, &throttle_pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -66,34 +66,20 @@ int main()
           steer_value = -steer_pid.Kp * steer_pid.p_error - steer_pid.Kd * steer_pid.d_error - steer_pid.Ki * steer_pid.i_error;
          
           throttle_pid.UpdateError(cte);
-          double throttle2 =  0.6 -throttle_pid.Kp * throttle_pid.p_error - throttle_pid.Kd * throttle_pid.d_error - throttle_pid.Ki * throttle_pid.i_error;
-          double throttle = 0.3;
-
-          double max_angle= M_PI/4;
-          // double sum = std::accumulate(steer_last_5.begin(), steer_last_5.end(), 0.0);
-          // // if(step>200){
-          //   if (counter == 5)
-          //   {
-          //     double avg_steer = sum/steer_last_5.size();
-          //     double min_steer = *std::min_element(steer_last_5.begin(), steer_last_5.end());
-          //     double max_steer = *std::max_element(steer_last_5.begin(), steer_last_5.end());
-          std::cout << "FABS CTE: " << fabs(cte) << " Steering Value: " << fabs(steer_value) << std::endl;
-          if( ((fabs(steer_value) > 0.2 || fabs(cte)> 0.2) && throttle2> 0.4)){
-             // steer_value = 1;
-             throttle2 = 0.2 ;
-             std::cout<<"XXXXX"<<std::endl;
+          double throttle =  0.6 -throttle_pid.Kp * throttle_pid.p_error - throttle_pid.Kd * throttle_pid.d_error - throttle_pid.Ki * throttle_pid.i_error;
+          
+          //minor fix on throttle if cte is over 0.2 and throttle is higher than 0.7
+          if( ((fabs(steer_value) > 0.2 || fabs(cte)> 0.2) && throttle> 0.7)){
+             throttle -= 0.5 ;
            }
 
-          //      std::cout<<"*** avg_steer "<<steer_value<<std::endl;
-          //    }
-          // }
 
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
-          std::cout << " throttle Value: " << throttle2 << std::endl;
+          std::cout << " throttle Value: " << throttle << std::endl;
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle2;
+          msgJson["throttle"] = throttle;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);

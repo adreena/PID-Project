@@ -4,9 +4,6 @@
 
 using namespace std;
 
-/*
-* TODO: Complete the PID class.
-*/
 
 PID::PID() {}
 
@@ -31,60 +28,32 @@ void PID::Init(double Kp, double Ki, double Kd) {
   cte_counter = 0;
   is_twiddling = false;
 
-//dp: 0.00271154 ,0.00221853 ,0.00246503
-//K: 1 ,0 ,0.00246503
-
 }
-// double PID::SimulateMove(double steer_angle, double speed) {
-//   double err =0.0f;
-//   double max_angle= M_PI/4;
-//   if(steer_angle > max_angle ){
-//     steer_angle = max_angle;
-//   }
-//   else if(steer_angle < -max_angle){
-//     steer_angle = -max_angle;
-//   }
-//
-// }
-//
 
-// int PID::LastUpdatedIndex(){
-//   int index= -1;
-//   for(unsigned i =0; i< 3; i++){
-//     if(last_update[i])
-//         return i;
-//   }
-//   return index;
-// }
 
 void PID::UpdateError(double cte) {
-  cte_counter++;
-  // double total_err = TotalError();
-  // if (counter > 1000)
-  current_err += cte*cte;
-  // bool twiddle = false;
-  // std::cout<<"** counter"<<counter<<endl;
+  //cte_counter++;
+  //current_err += cte*cte;
   p_error = cte;
   d_error = cte - cte_previous ;
   i_error += cte;
-  double total_dp = Totaldp();
-  std::cout<<"** total_dp "<<total_dp<<endl;
-  std::cout<<"** current_err "<<(current_err/cte_counter)<<endl;
-  std::cout<<"** cte_counter "<<cte_counter<<endl;
-  std::cout<<"** error "<<p_error<<", "<<d_error<<", "<<i_error<<endl;
+  cte_previous = cte;
+
+  //commented out ; I wasn't getting good results
+  // double total_dp = Totaldp();
   // double new_err = INFINITY;
   // if (total_dp > 0.2){
   //     bool counter_reached = false;
   //     if (!is_twiddling){ 
-  //       if(cte_counter == 200){
-  //         best_err = current_err/200;
+  //       if(cte_counter == 100){
+  //         best_err = current_err/100;
   //         counter_reached = true;
   //       }
   //     }
   //     else
   //     {
-  //       if(cte_counter == 7){
-  //         new_err = current_err/7;
+  //       if(cte_counter == 100){
+  //         new_err = current_err/100;
   //         std::cout<<"XxXXXXXXX"<<endl;
   //         counter_reached = true;
   //       }
@@ -98,27 +67,12 @@ void PID::UpdateError(double cte) {
   //     }
       
   //   }
-
-  //first 100 : best_err 0.571984
-  if(cte_counter == 10000){
-     best_err = current_err/10000;
-     std::cout<<"XxXXXXXXX"<<best_err<<endl;
-     exit(0);
-  }
   
-
-  
-  // std::cout<<"cte_previous: "<<cte_previous<<" cte: "<<cte<<" , total_dp: "<< total_dp<<endl;
-  // std::cout<<"dp: "<<dp[0]<<" ,"<<dp[1]<<" ,"<< dp[2]<<endl;
-  std::cout<<"K: "<<Kp<<" ,"<<Ki<<" ,"<< Kd<<endl;
-  // // std::cout<<"err: "<<p_error<<" ,"<<i_error<<" ,"<< d_error<<endl;
-  cte_previous = cte;
-  // std::cout<<"-----"<<endl;
 }
 
+// not used
 double PID::twiddle(double new_err, double best_err){
   
-  // std::cout<<"** best error "<<best_err<<endl;
   int previous_index = (counter-1) %3;
   int index = counter %3;
   std::cout<<"BEFORE: "<<best_err<<", new_err:"<<new_err<<endl;
@@ -165,11 +119,10 @@ double PID::twiddle(double new_err, double best_err){
     }
     std::cout<<"AFTER: "<<best_err<<endl;
     std::cout<<"** dp "<<dp[0]<<", "<<dp[1]<<", "<<dp[2]<<endl;
-    std::cout<<"--------------------------"<<endl;
     return best_err;
 }
 
-
+// not used
 void PID::UpdateParams(int index, int coef){
   if (index == 0){
     Kp += coef * dp[index];
@@ -186,6 +139,7 @@ double PID::TotalError() {
   return Kp * p_error + Ki * i_error + Kd * d_error;
 }
 
+// not used
 double PID::Totaldp() {
   return dp[0]+dp[1]+dp[2];
 }
